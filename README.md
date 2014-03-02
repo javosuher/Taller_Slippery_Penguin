@@ -1,4 +1,3 @@
-Taller_Slippery_Penguin.
-========================
+#Taller_Slippery_Penguin.
 
-Material y código del taller
+Material y código del taller.
