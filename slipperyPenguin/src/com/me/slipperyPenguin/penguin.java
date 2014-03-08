@@ -78,6 +78,11 @@ public class penguin { // Esta clase representa nuestro pingüino del juego.
 	public boolean choqueConRoca(rock roca) { // Método que permite conocer si nuestro pingüino se ha chocado con alguna roca. 
 		return bordes.overlaps(roca.getBordes());
 	}
+	
+	public void setPosicion(float x, float y) { // Asigna nueva posición al pingüino.
+		posicion.x = x;
+		posicion.y = y;
+	}
 		
 	// Getters -----------------------------------
 

@@ -5,6 +5,8 @@ import java.util.Random;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Texture;
@@ -36,6 +38,13 @@ public class GameScreen implements Screen { // Implementa la interfaz de Screen,
 	private int puntuacionMaxima; // Puntuación máxima que se ha conseguido.
 	private BitmapFont font; // Sirve para mostrar los letras y números por la pantalla.
 	
+	// Atributos para la música y sonidos del juego.
+	private Music musica; // Música del juego.
+	private Sound grito; // Grito que da el pingüino cuando muere.
+	private Sound golpe; // Sonido del golpe de la roca con el pingüino.
+	
+	private boolean gameOver; // Sirve para en el render dibujar el juego normal, o mostrar el game over.
+	
 	public GameScreen(slipperyPenguin slipperypenguin) { // Constructor de la clase.
 		this.sp = slipperypenguin;
 		random = new Random(); // Se inializa random.
@@ -61,7 +70,15 @@ public class GameScreen implements Screen { // Implementa la interfaz de Screen,
 		preferencias = Gdx.app.getPreferences("-_PreferencesSlipperyPenguin-_"); // Obtenemos los datos del fichero, o si no está creado, se crea automaticamente
 		puntuacionMaxima = preferencias.getInteger("Record", 0); // Asignamos la puntuación máxima que se encuentra en el fichero de preferencias. Si no existe el campo lo crea a 0.
 		font = new BitmapFont(Gdx.files.internal("data/arial.fnt"), Gdx.files.internal("data/arial.png"), false); // Asignamos a font el tipo de letra Arial.
-		font.setScale(0.6f); // Tamaño de la letra.
+		
+		// Creamos la música.
+		musica = Gdx.audio.newMusic(Gdx.files.internal("data/musica.mp3"));
+		grito = Gdx.audio.newSound(Gdx.files.internal("data/grito.wav"));
+		golpe = Gdx.audio.newSound(Gdx.files.internal("data/golpe.ogg"));
+		musica.setLooping(true); // Se pone para que la música nunca pare.
+		musica.play(); // Ponemos la música.
+		
+		gameOver = false;
 		
 		batch = new SpriteBatch(); // Es recomendable tener solo uno por juego.
 	}
@@ -73,6 +90,13 @@ public class GameScreen implements Screen { // Implementa la interfaz de Screen,
 		//En este caso glClearColor es un bucle (game loop) que establecera el fondo de la pantalla negro (0,0,0) con transparencia 1
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT); // Despues de la funcion anterior es necesario ejecutar esta, para que se lleve a cabo
 		
+		if(gameOver) // Si se ha perdido
+			renderGameOver();
+		else
+			renderJuegoNormal();
+	}
+	
+	private void renderJuegoNormal() {
 		pinguino.update(); // Actualizamos el pingüino.
 		actualizarRocas(); // Actualizamos las rocas.
 		
@@ -94,10 +118,41 @@ public class GameScreen implements Screen { // Implementa la interfaz de Screen,
 			batch.draw(texturaRoca, roca3.getPosicion().x, roca3.getPosicion().y, roca3.getAnchura(), roca3.getAltura());
 		
 		// Pintamos la puntuación y puntuación máxima.
+		font.setScale(0.6f); // Tamaño de la letra.
 		font.setColor(Color.BLACK); // Permite cambiar el color de la fuente.
 		font.draw(batch, "SCORE: " + Integer.toString(puntuacion), 10, 30);
 		font.setColor(Color.RED);
 		font.draw(batch, "MAX: " + Integer.toString(puntuacionMaxima), Gdx.graphics.getWidth() - 100, 30);
+		
+		batch.end(); // Terminamos el renderizado.
+	}
+	private void renderGameOver() {
+		if (Gdx.input.isTouched()) { // Si se pulsa la pantalla se vuelve a empezar el juego.
+			pinguino.setPosicion(0, Gdx.graphics.getHeight() - texturaPinguino.getHeight() - 10); // Ponemos al pingüino en su posición inicial.
+			roca2Activa = roca3Activa = false; // Desactivamos las rocas
+			roca1Activa = true; // Activamos la primera roca.
+			roca1 = new rock(new Vector2(random.nextInt(limite), 0 - texturaRoca.getHeight()), texturaRoca.getWidth(), texturaRoca.getHeight()); // Creamos la primera roca.
+			puntuacion = 0; // Reseteamos la puntuación.
+			musica.play(); // Volvemos a poner la música.
+			gameOver = false;
+		}
+		
+		batch.begin(); // Aqui por fin comenzamos el renderizado
+		
+		// Dibujamos el fondo en la posición x = 0 e y = 0.
+		batch.draw(texturaFondo, 0, 0, texturaFondo.getWidth(), texturaFondo.getHeight()); 
+		
+		// Pintamos la puntuación y puntuación máxima.
+		font.setScale(0.6f); // Tamaño de la letra.
+		font.setColor(Color.BLACK); // Permite cambiar el color de la fuente.
+		font.draw(batch, "SCORE: " + Integer.toString(puntuacion), 10, 30);
+		font.setColor(Color.RED);
+		font.draw(batch, "MAX: " + Integer.toString(puntuacionMaxima), Gdx.graphics.getWidth() - 100, 30);
+		
+		// Pintamos Game over en la pantalla
+		font.setScale(2f); // Tamaño de la letra.
+		font.setColor(Color.BLACK); // Permite cambiar el color de la fuente.
+		font.draw(batch, "GAME OVER", Gdx.graphics.getWidth() / 2 - 190, Gdx.graphics.getHeight() / 2 + 20);
 		
 		batch.end(); // Terminamos el renderizado.
 	}
@@ -158,7 +213,10 @@ public class GameScreen implements Screen { // Implementa la interfaz de Screen,
 			preferencias.putInteger("Record", puntuacionMaxima); // Guardamos la puntuación máxima en el fichero de preferencias.
 			preferencias.flush();
 		}
-		puntuacion = 0; // Reseteamos la puntuación.
+		gameOver = true; // Se pierde la partida.
+		musica.stop(); // Paramos la música.
+		golpe.play(); // Reproducimos el golpe.
+		grito.play(); // Suena el grito del pingüino.
 	}
 	
 	@Override
