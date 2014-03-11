@@ -10,14 +10,14 @@ public class rock { // Esta clase representa las rocas que tiene que esquivar nu
 	private float anchura, altura; // Anchura y altura de la roca.
 	private Rectangle bordes; // Rectangulo que ocupara el ancho y alto de la roca.
 	
-	public rock(Vector2 posicion, float anchura, float altura) {
+	public rock(Vector2 posicion, float anchura, float altura) { // Constructor
 		this.posicion = posicion;
 		this.anchura = anchura;
 		this.altura = altura;
 		bordes = new Rectangle(posicion.x, posicion.y, anchura, altura);
 	}
 	
-	public void update() {
+	public void update() { // Función que se ejecuta en Render de GameScren, y sirve para actualizar los valores de las rocas.
 		posicion.y = posicion.y + SPEED; // Se mueven hacia arriba en la pantalla
 		
 		// Actualizamos los bordes en el eje y, ya que las rocas solo se mueven en esa dirección.

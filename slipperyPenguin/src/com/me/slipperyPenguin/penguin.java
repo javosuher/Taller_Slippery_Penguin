@@ -15,14 +15,14 @@ public class penguin { // Esta clase representa nuestro pingüino del juego.
 	private float anchura, altura; // Anchura y altura del pingüino.
 	private Rectangle bordes; // Rectangulo que ocupara el ancho y alto del pingüino.
 	
-	public penguin(Vector2 posicion, float anchura, float altura) {
+	public penguin(Vector2 posicion, float anchura, float altura) { // Constructor
 		this.posicion = posicion;
 		this.anchura = anchura;
 		this.altura = altura;
 		bordes = new Rectangle(posicion.x, posicion.y, anchura, altura);
 	}
 	
-	public void update() { // Funcion que se ejecuta en Render de GameScren, y son las opciones que puede tener la nave
+	public void update() { // Función que se ejecuta en Render de GameScren, y sirve para actualizar los valores del pingüino.
 		if(Gdx.app.getType() == ApplicationType.Desktop) // Si estamos jugando en nuestro ordenador
 			entradaDesktop();
 		else if(Gdx.app.getType() == ApplicationType.Android) // Si se esta ejecutando en android
@@ -34,16 +34,16 @@ public class penguin { // Esta clase representa nuestro pingüino del juego.
 	}
 	
 	private void entradaDesktop() { // Acciones del pingüino si estamos ejecutando el juego en nuestro PC
-		if(Gdx.input.isKeyPressed(Keys.RIGHT)) {
+		if(Gdx.input.isKeyPressed(Keys.RIGHT)) { // Si presionamos la tecla derecha
 			float nuevaPosicion = posicion.x + SPEED; // a la posicion en x le sumo la velocidad que hemos determinado por SPEED.
 			if(noChoqueConLimiteDerecho(nuevaPosicion)) // Si no choca con el limite derecho.
 				posicion.x = nuevaPosicion;
 			else
 				posicion.x = LIMITE_DERECHA - anchura;
 		}
-		if(Gdx.input.isKeyPressed(Keys.LEFT)) { // Si no choca con el limite izquierdo.
+		if(Gdx.input.isKeyPressed(Keys.LEFT)) { // Si presionamos la tecla izquierda.
 			float nuevaPosicion = posicion.x - SPEED; // lo mismo pero restandole, ya que vamos a la izquierda
-			if(noChoqueConLimiteIzquierdo(nuevaPosicion))
+			if(noChoqueConLimiteIzquierdo(nuevaPosicion)) // Si no choca con el limite izquierdo.
 				posicion.x = nuevaPosicion;
 			else
 				posicion.x = LIMITE_IZQUIERDA;

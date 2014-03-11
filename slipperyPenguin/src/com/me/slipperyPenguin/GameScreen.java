@@ -20,7 +20,7 @@ public class GameScreen implements Screen { // Implementa la interfaz de Screen,
 	//reescalar, pausar, resumir...) menos con dispose, para liberar los recursos hay que llamar a dispose manualmente
 	
 	private slipperyPenguin sp;
-	private Texture texturaFondo, texturaPinguino, texturaRoca; // Una Texture es una clase que envuelve una textura estandar de OpenGL, se utiliza para imagenes simples.
+	private Texture texturaFondo, texturaPinguino, texturaPinguinoMuerto, texturaRoca; // Una Texture es una clase que envuelve una textura estandar de OpenGL, se utiliza para imagenes simples.
 	private SpriteBatch batch; // "Grupo de Sprites (imagenes)" nos permite dibujar rectagulos como referencias a texturas, es necesario para mostrar todo por pantalla.
 	
 	// Personajes del juego
@@ -57,6 +57,8 @@ public class GameScreen implements Screen { // Implementa la interfaz de Screen,
 		// Creamos el pingüino
 		texturaPinguino = new Texture("data/pinguin.png");
 		texturaPinguino.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		texturaPinguinoMuerto = new Texture("data/deadPinguin.png"); // La textura del pingüino muerto.
+		texturaPinguinoMuerto.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		pinguino = new penguin(new Vector2(0, Gdx.graphics.getHeight() - texturaPinguino.getHeight() - 10), texturaPinguino.getWidth(), texturaPinguino.getHeight());
 		
 		// Creamos los datos necesarios de las rocas.
@@ -141,6 +143,8 @@ public class GameScreen implements Screen { // Implementa la interfaz de Screen,
 		
 		// Dibujamos el fondo en la posición x = 0 e y = 0.
 		batch.draw(texturaFondo, 0, 0, texturaFondo.getWidth(), texturaFondo.getHeight()); 
+		// Dibujamos el pingüino muerto.
+		batch.draw(texturaPinguinoMuerto, pinguino.getPosicion().x, pinguino.getPosicion().y, pinguino.getAnchura(), pinguino.getAltura());
 		
 		// Pintamos la puntuación y puntuación máxima.
 		font.setScale(0.6f); // Tamaño de la letra.
